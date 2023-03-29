@@ -22,6 +22,10 @@ module quarter_circle(radius) {
 
 quarter_circle(56);
 
+color("grey") curved_track(32);
+rotate([0,0,22.5]) color("grey") curved_track(32);
+
+
 //color("grey") curved_track(24);
 //color("grey") curved_track(32);
 //color("grey") curved_track(40);
@@ -112,12 +116,14 @@ module sleepers_connector() {
                 translate([0,6*stud_spacing,3.2]) cube(stud_spacing);
                 
             }
+            // rail plate
+            translate([2.2,6*stud_spacing+1,2.4]) rotate([0,0,90]) rounded_square(5, 1.75, 0.8);
         }
         // under side holes
         translate([wall_thickness, wall_thickness+0*stud_spacing]) cube([hole_size,hole_size,2]);
         translate([wall_thickness, wall_thickness+1*stud_spacing]) {
             translate([hole_size/2,hole_size/2]) cylinder(h=2, d=hole_size, center=false, $fn=24);
-            translate([-2.5,0]) cube([hole_size,hole_size,2]);
+            translate([-2.5,0]) cube([hole_size,hole_size,3.21]);
         }
         translate([wall_thickness, wall_thickness+2*stud_spacing]) rounded_hole(mirrored=true);
         translate([wall_thickness, wall_thickness+3*stud_spacing]) rounded_hole();
@@ -125,9 +131,13 @@ module sleepers_connector() {
         translate([wall_thickness, wall_thickness+5*stud_spacing])  rounded_hole();
         translate([wall_thickness, wall_thickness+6*stud_spacing]) {
             translate([hole_size/2,hole_size/2]) cylinder(h=2, d=hole_size, center=false, $fn=24);
-            #translate([-2.5,0]) cube([hole_size,hole_size,3.21]);
+            translate([-2.5,0]) cube([hole_size,hole_size,2.6]);
         }
         translate([wall_thickness, wall_thickness+7*stud_spacing]) cube([hole_size,hole_size,2]);
+        
+        // top cut away
+        translate([-4,6*stud_spacing+4,3]) cube([8,4,10]);
+        translate([-4,1*stud_spacing+4,1.6]) cube([8,3.6,10]);
     }
 }
 
@@ -177,8 +187,8 @@ module curved_track(radius, segments=0) {
             rotate_extrude(angle=angle, $fn=360) translate([rail_radius,0,0]) {
                 polygon(points=rail_crossection);
             }        
-            translate([rail_radius-1,-stud_spacing/2,3.2]) cube(stud_spacing);
-            rotate([0,0,angle]) translate([rail_radius-1,-stud_spacing/2,3.2]) cube(stud_spacing);
+            translate([rail_radius-1,-stud_spacing/2,0]) cube([stud_spacing,stud_spacing,10]);
+            rotate([0,0,angle]) translate([rail_radius-1,-stud_spacing/2,0]) cube([stud_spacing,stud_spacing,10]);
         }
         translate([rail_radius,stud_spacing/2,0]) rail_connector();  
         rotate([0,0,angle]) translate([rail_radius+6,-stud_spacing/2,0]) rotate([0,0,180]) rail_connector();
@@ -260,3 +270,20 @@ module sleepers() {
         translate([2*stud_spacing+wall_thickness, hole_size/2-wall_thickness-stud_spacing, -0.01]) cube([stud_spacing-2*wall_thickness,2*stud_spacing-2*wall_thickness,2]);
     }
 }
+
+module rounded_square(square_size, corner_radius, height) {
+    diff = square_size - corner_radius;
+    linear_extrude(height) difference() {
+        square(square_size);
+        translate([diff, diff]) difference() {
+            square(corner_radius);
+            circle(corner_radius, $fn=24);
+        }
+        translate([corner_radius, diff]) rotate([0,0,90]) difference() {
+            square(corner_radius);
+            circle(corner_radius, $fn=24);
+        }
+    }
+}
+
+rounded_square(12, 3, 5);
